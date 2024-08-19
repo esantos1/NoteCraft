@@ -1,4 +1,4 @@
-# Markdown Notes Editor
+# NoteCraft
 
 Um editor de notas orientado a Markdown desenvolvido com Flutter, projetado para oferecer uma experiência de escrita poderosa e flexível. É ideal para desenvolvedores, escritores e profissionais que precisam organizar suas ideias de maneira estruturada e eficiente.
 
@@ -53,4 +53,4 @@ Este projeto é licenciado sob a [MIT License](LICENSE).
 
 ## Contato
 
-Para mais informações, entre em contato pelo [LinkedIn](https://www.linkedin.com/in/ericksantos11/) ou por email em ericksantodev@gmail.com.
+Caso tenha interesse em colaborar ou tenha dúvidas, entre em contato pelo [LinkedIn](https://www.linkedin.com/in/ericksantos11/) ou pelo email [ericksantodev@gmail.com](mailto:ericksantodev@gmail.com?subject=Interesse%20em%20colaborar%20com%20NoteCraft). Confira também meu [portfólio](https://ericksantos.com.br)!
