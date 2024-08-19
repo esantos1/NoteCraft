@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttermarkdown/boxes.dart';
 import 'package:fluttermarkdown/classes/note.dart';
+import 'package:fluttermarkdown/themes/app_theme.dart';
 import 'package:fluttermarkdown/views/edit_note_view.dart';
 import 'package:fluttermarkdown/views/list_notes_view.dart';
 import 'package:fluttermarkdown/views/note_visualizer_view.dart';
@@ -22,9 +23,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      theme: lightTheme,
       routes: {
         '/': (context) => ListNotesView(),
         '/vizualizer': (context) => NoteVisualizerView(),

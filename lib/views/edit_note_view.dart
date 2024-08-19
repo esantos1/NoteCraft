@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:fluttermarkdown/boxes.dart';
 import 'package:fluttermarkdown/classes/note.dart';
+import 'package:fluttermarkdown/widgets/markdown_body_formatted.dart';
 
 class EditNoteView extends StatefulWidget {
   const EditNoteView({super.key});
@@ -39,9 +39,6 @@ class _EditNoteViewState extends State<EditNoteView>
     if (args != null) {
       note = args!['note'];
       key = args!['key'];
-    }
-
-    if (args != null) {
       oldTitle = note!.title;
       oldBody = note!.body;
       _titleController.text = note!.title;
@@ -60,39 +57,51 @@ class _EditNoteViewState extends State<EditNoteView>
 
   @override
   Widget build(BuildContext context) {
-    bool isEdited =
-        _titleController.text != oldTitle || _bodyController.text != oldBody;
+    bool isEdited = _titleController.text.trim() != oldTitle ||
+        _bodyController.text.trim() != oldBody;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Minha nota'),
-        actions: [
-          TextButton.icon(
-            onPressed: isEdited ? saveNote : null,
-            icon: Icon(Icons.save),
-            label: Text('Salvar'),
-          ),
-        ],
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: [
-            Tab(
-              icon: Icon(Icons.edit),
-              text: 'Editar',
-            ),
-            Tab(
-              icon: Icon(Icons.remove_red_eye),
-              text: 'Preview',
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) async {
+        if (didPop) return;
+
+        final shouldPop = await _showExitConfirmationDialog(context);
+
+        if (context.mounted && shouldPop) {
+          Navigator.pop(context);
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Minha nota'),
+          actions: [
+            TextButton.icon(
+              onPressed: isEdited ? saveNote : null,
+              icon: Icon(Icons.save),
+              label: Text('Salvar'),
             ),
           ],
+          bottom: TabBar(
+            controller: _tabController,
+            tabs: [
+              Tab(
+                icon: Icon(Icons.edit),
+                text: 'Editar',
+              ),
+              Tab(
+                icon: Icon(Icons.remove_red_eye),
+                text: 'Preview',
+              ),
+            ],
+          ),
         ),
-      ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _editTab(),
-          _previewTab(),
-        ],
+        body: TabBarView(
+          controller: _tabController,
+          children: [
+            _editTab(),
+            _previewTab(),
+          ],
+        ),
       ),
     );
   }
@@ -108,6 +117,7 @@ class _EditNoteViewState extends State<EditNoteView>
                 border: InputBorder.none,
                 hintText: 'Título',
               ),
+              textAlignVertical: TextAlignVertical.center,
               onChanged: onTitleChanged,
             ),
             SizedBox(height: 8),
@@ -120,7 +130,6 @@ class _EditNoteViewState extends State<EditNoteView>
                   keyboardType: TextInputType.multiline,
                   maxLines: null,
                   decoration: InputDecoration(
-                    border: InputBorder.none,
                     hintText: 'Digite sua nota aqui',
                   ),
                   onChanged: onBodyChanged,
@@ -132,26 +141,54 @@ class _EditNoteViewState extends State<EditNoteView>
       );
 
   Widget _previewTab() => ListView(
-        padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 38.0),
+        padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
         children: [
           Text(
             _titleController.text,
             style: Theme.of(context)
                 .textTheme
-                .headlineMedium
+                .headlineSmall
                 ?.copyWith(fontWeight: FontWeight.w700),
+            textAlign: TextAlign.center,
           ),
           Padding(
-            padding: EdgeInsets.only(top: 8.0, bottom: 24.0),
+            padding: EdgeInsets.only(top: 8.0, bottom: 8.0),
             child: Divider(),
           ),
-          MarkdownBody(data: _bodyController.text),
+          MarkdownBodyFormatted(data: _bodyController.text)
         ],
       );
 
   void onTitleChanged(String _) => setState(() {});
 
   void onBodyChanged(String _) => setState(() {});
+
+  Future<bool> _showExitConfirmationDialog(BuildContext context) async =>
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Alterações Não Salvas'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Você tem alterações não salvas.'),
+                Text('Se sair, todas as alterações serão perdidas.'),
+              ],
+            ),
+          ),
+          actions: [
+            ElevatedButton(
+              child: Text('Cancelar'),
+              onPressed: () => Navigator.pop(context, false),
+            ),
+            ElevatedButton(
+              child: Text('Sair'),
+              onPressed: () => Navigator.pop(context, true),
+            ),
+          ],
+        ),
+      ) ??
+      false;
 
   void saveNote() {
     String title;

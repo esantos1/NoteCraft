@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:fluttermarkdown/boxes.dart';
 import 'package:fluttermarkdown/classes/note.dart';
+import 'package:fluttermarkdown/widgets/markdown_body_formatted.dart';
 
 class NoteVisualizerView extends StatelessWidget {
   const NoteVisualizerView({super.key});
@@ -35,7 +35,7 @@ class NoteVisualizerView extends StatelessWidget {
                 leading: Icon(Icons.title),
                 title: Text(
                   note.title,
-                  style: TextStyle(fontSize: 19),
+                  style: TextStyle(fontSize: 19, fontWeight: FontWeight.w700),
                 ),
               ),
             ),
@@ -46,12 +46,7 @@ class NoteVisualizerView extends StatelessWidget {
                       alignment: Alignment.center,
                       child: Text('Nenhum texto adicionado'),
                     )
-                  : ListTile(
-                      title: MarkdownBody(
-                        data: note.body,
-                        selectable: true,
-                      ),
-                    ),
+                  : MarkdownBodyFormatted(data: note.body),
             ),
           ],
         ),

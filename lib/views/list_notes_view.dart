@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:fluttermarkdown/boxes.dart';
 import 'package:fluttermarkdown/classes/note.dart';
 import 'package:fluttermarkdown/controllers/list_notes_controller.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:intl/intl.dart';
 
 class ListNotesView extends StatefulWidget {
   const ListNotesView({super.key});
@@ -13,30 +16,49 @@ class ListNotesView extends StatefulWidget {
 
 class _ListNotesViewState extends State<ListNotesView> {
   final controller = ListNotesController();
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _timer = Timer.periodic(Duration(minutes: 1), (Timer t) {
+      setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: _appBar(),
         body: ValueListenableBuilder(
-            valueListenable: boxNotes.listenable(),
-            builder: (context, box, _) {
-              if (box.isEmpty) {
-                return Center(
-                  child: Text('Você não criou nenhuma nota ainda!'),
-                );
-              }
+          valueListenable: boxNotes.listenable(),
+          builder: (context, box, _) {
+            final notes = box.values.toList();
+            notes.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
 
-              return ListView.builder(
-                padding: EdgeInsets.all(8),
-                itemCount: boxNotes.length,
-                itemBuilder: (context, index) {
-                  final key = box.keyAt(index);
-                  Note item = box.getAt(index);
-
-                  return _buildItems(item, context, key);
-                },
+            if (notes.isEmpty) {
+              return Center(
+                child: Text('Você não criou nenhuma nota ainda!'),
               );
-            }),
+            }
+            return ListView.builder(
+              padding: EdgeInsets.all(8),
+              itemCount: notes.length,
+              itemBuilder: (context, index) {
+                final item = notes[index];
+                final key = box.keyAt(box.values.toList().indexOf(item));
+
+                return _buildItems(item, context, key);
+              },
+            );
+          },
+        ),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () => Navigator.pushNamed(context, '/edit'),
           label: Text('Criar nota'),
@@ -66,7 +88,7 @@ class _ListNotesViewState extends State<ListNotesView> {
                 });
 
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Todos as notas foram excluídas!')),
+                  SnackBar(content: Text('As notas foram excluídas!')),
                 );
               },
               icon: Icon(Icons.delete),
@@ -75,7 +97,7 @@ class _ListNotesViewState extends State<ListNotesView> {
         )
       : AppBar(title: Text('Minhas Notas'));
 
-  Widget _buildItems(item, BuildContext context, key) => Card(
+  Widget _buildItems(Note item, BuildContext context, key) => Card(
         child: ListTile(
           leading: controller.model.selectedNotesKeys.contains(key)
               ? CircleAvatar(child: Icon(Icons.check))
@@ -87,7 +109,7 @@ class _ListNotesViewState extends State<ListNotesView> {
             style: TextStyle(fontWeight: FontWeight.w600),
           ),
           subtitle: Text(
-            'Editada em ${item.updatedAt.toString()}',
+            formatDate(item.updatedAt),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -97,6 +119,27 @@ class _ListNotesViewState extends State<ListNotesView> {
           selectedTileColor: Colors.indigo[50],
         ),
       );
+
+  String formatDate(DateTime dateTime) {
+    final now = DateTime.now();
+    final difference = now.difference(dateTime);
+
+    if (difference.inSeconds < 60) {
+      return 'Editado agora há pouco';
+    } else if (difference.inMinutes < 60) {
+      return 'Editado há ${difference.inMinutes} min';
+    } else if (difference.inHours < 24) {
+      return 'Editado há ${difference.inHours} h';
+    } else if (difference.inDays == 1) {
+      return 'Editado ontem';
+    } else if (difference.inDays < 7) {
+      return 'Editado há ${difference.inDays} dias';
+    } else if (dateTime.year == now.year) {
+      return 'Editado em ${DateFormat('dd/MM').format(dateTime)}';
+    } else {
+      return 'Editado em ${DateFormat('dd/MM/yyyy').format(dateTime)}';
+    }
+  }
 
   void addOrRemoveAllToSelectedItemsList() => setState(() {
         if (controller.model.selectedNotesKeys.isNotEmpty &&

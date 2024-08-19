@@ -1,5 +1,8 @@
 name: fluttermarkdown
-description: A new Flutter project.
+description: >
+  Um poderoso editor de notas orientado a Markdown, desenvolvido com Flutter. Este aplicativo oferece uma experiência de escrita rica e intuitiva, com suporte a formatação em Markdown. Ideal para desenvolvedores, escritores e qualquer pessoa que valorize a organização e clareza em suas anotações.
+
+  Desenvolvido com foco em desempenho, usabilidade e extensibilidade, este projeto demonstra o uso eficaz de boas práticas em Flutter, arquitetura limpa e padrões de design modernos.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -36,8 +39,12 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   flutter_markdown: ^0.7.3
+  flutter_highlight:
   hive:
   hive_flutter:
+  url_launcher:
+  intl:
+  markdown: ^7.2.2
 
 dev_dependencies:
   flutter_test:
@@ -78,17 +85,12 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-  #   - family: Trajan Pro
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
+  fonts:
+    - family: SourceCodePro
+      fonts:
+        - asset: assets/fonts/SourceCodePro-Regular.ttf
+        - asset: assets/fonts/SourceCodePro-Bold.ttf
+          weight: 700
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
